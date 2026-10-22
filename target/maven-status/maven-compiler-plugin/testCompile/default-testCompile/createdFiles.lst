@@ -1,0 +1,5 @@
+com/kizuna/PasswordAndAvatarTest.class
+com/kizuna/DatabaseBootstrapTest.class
+com/kizuna/SvgLogoRendererTest.class
+com/kizuna/RecommendationEngineTest.class
+com/kizuna/service/WorkflowIntegrationTest.class

@@ -1,0 +1,35 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run Kizuna (JavaFX)",
+      "type": "shell",
+      "command": "${workspaceFolder}/mvnw",
+      "windows": {
+        "command": "${workspaceFolder}\\mvnw.cmd"
+      },
+      "args": ["javafx:run"],
+      "group": "none",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": false
+      }
+    },
+    {
+      "label": "Build and test Kizuna",
+      "type": "shell",
+      "command": "${workspaceFolder}/mvnw",
+      "windows": {
+        "command": "${workspaceFolder}\\mvnw.cmd"
+      },
+      "args": ["clean", "test"],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": false
+      }
+    }
+  ]
+}
