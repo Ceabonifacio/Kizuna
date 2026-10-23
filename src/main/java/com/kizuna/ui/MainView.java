@@ -90,7 +90,8 @@ public final class MainView {
         header.getStyleClass().add("top-bar");
         Label brand = new Label("Kizuna"); brand.getStyleClass().add("brand");
         Label tagline = new Label("Campus Event and Student Club Network App"); tagline.getStyleClass().add("top-tagline");
-        VBox identity = new VBox(2, brand, tagline);
+        Label school = new Label("Mindanao Kokusai Daigaku"); school.getStyleClass().add("school-name");
+        VBox identity = new VBox(2, brand, tagline, school);
         Region spacer = new Region(); HBox.setHgrow(spacer, Priority.ALWAYS);
         header.getChildren().addAll(identity, spacer);
         context.session.currentUser().ifPresent(user -> {
@@ -104,8 +105,8 @@ public final class MainView {
     private void setContent(Node node) { root.setCenter(node); }
 
     private VBox page(String title, String description) {
-        VBox box = new VBox(18);
-        box.setPadding(new Insets(28, 40, 38, 40));
+        VBox box = new VBox(22);
+        box.setPadding(new Insets(32, 36, 42, 36));
         box.setFillWidth(true);
         Label heading = new Label(title); heading.getStyleClass().add("page-title"); heading.setWrapText(true);
         box.getChildren().add(heading);
@@ -132,7 +133,7 @@ public final class MainView {
     private VBox field(String title, Node control) {
         Label label = label(title); label.getStyleClass().add("field-label");
         label.setLabelFor(control);
-        VBox group = new VBox(6, label, control); group.setFillWidth(true); return group;
+        VBox group = new VBox(8, label, control); group.setFillWidth(true); return group;
     }
     private Label messageLabel() { Label label = new Label(); label.setWrapText(true); label.getStyleClass().add("form-message"); return label; }
     private void error(Label label, Throwable error) {
@@ -161,7 +162,7 @@ public final class MainView {
         });
         Button login = loginRef[0];
         Button signup = button("Create an account", "button-link", this::showSignup);
-        VBox form = card(); form.setMaxWidth(480); form.setAlignment(Pos.TOP_CENTER);
+        VBox form = card(); form.setSpacing(16); form.setPadding(new Insets(24)); form.setMaxWidth(480); form.setAlignment(Pos.TOP_CENTER);
         form.getChildren().addAll(logoView(124), sectionTitle("Student sign in"), field("Username", username), field("Password", password), message, login, signup);
         page.setAlignment(Pos.TOP_CENTER); page.getChildren().add(form);
         setContent(scroll(page));
@@ -205,7 +206,7 @@ public final class MainView {
         });
         Button create = createRef[0];
         Button back = button("Back to log in", "button-link", this::showLogin);
-        VBox form = card(); form.setMaxWidth(560);
+        VBox form = card(); form.setSpacing(16); form.setPadding(new Insets(24)); form.setMaxWidth(560);
         form.setAlignment(Pos.TOP_CENTER);
         form.getChildren().addAll(logoView(116), sectionTitle("Student account"), field("Username", username), field("Full name", fullName), field("Academic year", year),
                 field("Password (10–128 characters)", password), field("Confirm password", confirm), field("Profile photo (optional)", photoRow), message, create, back);
@@ -227,10 +228,11 @@ public final class MainView {
         if (user.assessmentCompletedAt() == null && managed.isEmpty()) { showAssessment(); return; }
         refreshHeader();
         VBox page = page("Hello, " + user.fullName(), "Find a club community, see what is happening, and follow your applications.");
-        HBox dashboardBrand = new HBox(18, logoView(88), new VBox(8, sectionTitle("Kizuna"), label("Discover clubs, meet students, and find upcoming campus events.")));
+        Label school = label("Mindanao Kokusai Daigaku"); school.getStyleClass().add("school-name");
+        HBox dashboardBrand = new HBox(18, logoView(88), new VBox(8, sectionTitle("Kizuna"), school, label("Discover clubs, meet students, and find upcoming campus events.")));
         dashboardBrand.setAlignment(Pos.CENTER_LEFT);
         page.getChildren().add(dashboardBrand);
-        FlowPane actions = new FlowPane(14, 14);
+        FlowPane actions = new FlowPane(16, 16);
         actions.getChildren().addAll(dashboardAction("See Club Network", "Explore active club memberships as a network or hierarchy.", this::showNetwork),
                 dashboardAction("Upcoming Club Events", "Browse upcoming events from all six clubs.", this::showUpcomingEvents),
                 dashboardAction("My Applications", "Check application and interview progress.", this::showMyApplications));

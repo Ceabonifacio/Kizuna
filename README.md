@@ -1,6 +1,6 @@
 # Kizuna
 
-Kizuna is a local JavaFX desktop app for exploring student clubs and events, completing a preference assessment, applying to clubs, and managing applications for clubs where you hold an active leadership membership. SQLite stores the application data on this computer. It does not synchronize between computers.
+Kizuna is a local JavaFX desktop app for Mindanao Kokusai Daigaku students to explore clubs and events, complete a preference assessment, apply to clubs, and manage applications for clubs where they hold an active leadership membership. SQLite stores the application data on this computer. It does not synchronize between computers.
 
 ## Requirements
 

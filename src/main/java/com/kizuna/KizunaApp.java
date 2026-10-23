@@ -18,7 +18,7 @@ public final class KizunaApp extends Application {
 
     @Override
     public void start(Stage stage) {
-        stage.setTitle("Kizuna | Campus Clubs");
+        stage.setTitle("Kizuna | Mindanao Kokusai Daigaku");
         stage.setMinWidth(900);
         stage.setMinHeight(600);
         StackPane loading = new StackPane(); loading.getStyleClass().add("app-root");
