@@ -343,32 +343,34 @@ public final class MainView {
     private Node networkPane(List<NetworkClub> clubs) {
         if (clubs.isEmpty()) return emptyState("No clubs are available.");
         double contentHeight = 24;
-        for (NetworkClub club : clubs) contentHeight += Math.max(160, 20 + club.members().size() * 170.0);
+        for (NetworkClub club : clubs) contentHeight += Math.max(190, 20 + club.members().size() * 170.0);
         Pane pane = new Pane(); pane.setPrefSize(1120, Math.max(160, contentHeight + 10));
         double y = 24;
         for (int i = 0; i < clubs.size(); i++) {
             NetworkClub item = clubs.get(i);
-            double rowHeight = Math.max(160, 20 + item.members().size() * 170.0);
-            VBox clubCard = card(); clubCard.getStyleClass().add("club-node"); clubCard.setPrefSize(260, 130); clubCard.setLayoutX(24); clubCard.setLayoutY(y + 20);
-            clubCard.getChildren().addAll(sectionTitle(item.club().name()), label(item.club().description()));
+            double rowHeight = Math.max(190, 20 + item.members().size() * 170.0);
+            VBox clubCard = card(); clubCard.getStyleClass().add("club-node"); clubCard.setPrefSize(300, 160); clubCard.setLayoutX(24); clubCard.setLayoutY(y + 20);
+            Label clubName = sectionTitle(item.club().name()); clubName.setMaxWidth(Double.MAX_VALUE);
+            Label description = label(item.club().description()); description.setMaxWidth(Double.MAX_VALUE);
+            clubCard.getChildren().addAll(clubName, description);
             pane.getChildren().add(clubCard);
             if (item.members().isEmpty()) {
-                Label none = label("No active members"); none.getStyleClass().add("muted"); none.setLayoutX(370); none.setLayoutY(y + 52); pane.getChildren().add(none);
+                Label none = label("No active members"); none.getStyleClass().add("muted"); none.setLayoutX(410); none.setLayoutY(y + 91); pane.getChildren().add(none);
                 y += rowHeight;
                 continue;
             }
-            double spineX = 320;
-            double firstCenterY = y + 76;
-            double lastCenterY = y + 76 + (item.members().size() - 1) * 170.0;
-            Line clubEdge = new Line(284, y + 67, spineX, y + 67); clubEdge.getStyleClass().add("graph-edge"); pane.getChildren().add(clubEdge);
-            Line spine = new Line(spineX, Math.min(y + 67, firstCenterY), spineX, Math.max(y + 67, lastCenterY));
+            double spineX = 360;
+            double firstCenterY = y + 100;
+            double lastCenterY = firstCenterY + (item.members().size() - 1) * 170.0;
+            Line clubEdge = new Line(324, firstCenterY, spineX, firstCenterY); clubEdge.getStyleClass().add("graph-edge"); pane.getChildren().add(clubEdge);
+            Line spine = new Line(spineX, firstCenterY, spineX, lastCenterY);
             spine.getStyleClass().add("graph-edge"); pane.getChildren().add(spine);
             for (int j = 0; j < item.members().size(); j++) {
-                double x = 370;
+                double x = 410;
                 double nodeY = y + 20 + j * 170.0;
-                double centerY = nodeY + 75;
+                double centerY = nodeY + 80;
                 Line branch = new Line(spineX, centerY, x, centerY); branch.getStyleClass().add("graph-edge"); pane.getChildren().add(branch);
-                VBox node = memberCard(item.members().get(j)); node.setPrefSize(330, 150); node.setMinSize(330, 150);
+                VBox node = memberCard(item.members().get(j)); node.setPrefSize(330, 160); node.setMinSize(330, 160);
                 node.setLayoutX(x); node.setLayoutY(nodeY); pane.getChildren().add(node);
             }
             y += rowHeight;
@@ -385,31 +387,35 @@ public final class MainView {
         groups.put(Role.PRESIDENT, new ArrayList<>()); groups.put(Role.VICE_PRESIDENT, new ArrayList<>()); groups.put(Role.MEMBER, new ArrayList<>());
         for (MemberProfile member : network.members()) groups.get(member.role()).add(member);
         int maxLeaves = groups.values().stream().mapToInt(List::size).max().orElse(1);
-        double height = Math.max(580, 300 + maxLeaves * 175.0);
+        double height = Math.max(650, 340 + maxLeaves * 180.0);
         Pane pane = new Pane(); pane.setPrefSize(1180, height);
-        VBox rootCard = card(); rootCard.getStyleClass().add("club-node"); rootCard.setAlignment(Pos.CENTER); rootCard.setPrefSize(320, 100); rootCard.setLayoutX(430); rootCard.setLayoutY(20);
-        rootCard.getChildren().addAll(sectionTitle(network.club().name()), label(network.club().description())); pane.getChildren().add(rootCard);
+        VBox rootCard = card(); rootCard.getStyleClass().add("club-node"); rootCard.setAlignment(Pos.CENTER); rootCard.setPrefSize(400, 150); rootCard.setLayoutX(390); rootCard.setLayoutY(20);
+        Label clubName = sectionTitle(network.club().name()); clubName.setMaxWidth(Double.MAX_VALUE);
+        Label description = label(network.club().description()); description.setMaxWidth(Double.MAX_VALUE);
+        rootCard.getChildren().addAll(clubName, description); pane.getChildren().add(rootCard);
         Role[] roles = {Role.PRESIDENT, Role.VICE_PRESIDENT, Role.MEMBER};
         String[] names = {"President", "Vice President", "Members"}; double[] x = {30, 430, 830};
         double[] centers = {190, 590, 990};
-        Line trunk = new Line(590, 120, 590, 145); trunk.getStyleClass().add("hierarchy-edge"); pane.getChildren().add(trunk);
-        Line level = new Line(centers[0], 145, centers[2], 145); level.getStyleClass().add("hierarchy-edge"); pane.getChildren().add(level);
+        Line trunk = new Line(590, 170, 590, 195); trunk.getStyleClass().add("hierarchy-edge"); pane.getChildren().add(trunk);
+        Line level = new Line(centers[0], 195, centers[2], 195); level.getStyleClass().add("hierarchy-edge"); pane.getChildren().add(level);
         for (int i = 0; i < roles.length; i++) {
             List<MemberProfile> people = groups.get(roles[i]); double center = centers[i];
-            Line rootEdge = new Line(center, 145, center, 180); rootEdge.getStyleClass().add("hierarchy-edge"); pane.getChildren().add(rootEdge);
-            VBox group = card(); group.getStyleClass().add("group-node"); group.setAlignment(Pos.CENTER); group.setPrefSize(320, 60); group.setLayoutX(x[i]); group.setLayoutY(180);
+            Line rootEdge = new Line(center, 195, center, 225); rootEdge.getStyleClass().add("hierarchy-edge"); pane.getChildren().add(rootEdge);
+            VBox group = card(); group.getStyleClass().add("group-node"); group.setAlignment(Pos.CENTER); group.setPrefSize(320, 60); group.setLayoutX(x[i]); group.setLayoutY(225);
             group.getChildren().add(sectionTitle(names[i])); pane.getChildren().add(group);
             if (people.isEmpty()) {
-                Label none = label("No active members"); none.getStyleClass().add("muted"); none.setLayoutX(x[i] + 35); none.setLayoutY(270); pane.getChildren().add(none);
+                Label none = label("No active members"); none.getStyleClass().add("muted"); none.setLayoutX(x[i] + 35); none.setLayoutY(310); pane.getChildren().add(none);
                 continue;
             }
             double spineX = x[i] + 18;
-            double firstCenterY = 270 + 80;
-            double lastCenterY = firstCenterY + (people.size() - 1) * 175.0;
-            Line branchFromGroup = new Line(center, 240, spineX, 240); branchFromGroup.getStyleClass().add("hierarchy-edge"); pane.getChildren().add(branchFromGroup);
-            Line spine = new Line(spineX, 240, spineX, lastCenterY); spine.getStyleClass().add("hierarchy-edge"); pane.getChildren().add(spine);
+            double firstCenterY = 405;
+            double lastCenterY = firstCenterY + (people.size() - 1) * 180.0;
+            double branchY = 305;
+            Line groupDrop = new Line(center, 285, center, branchY); groupDrop.getStyleClass().add("hierarchy-edge"); pane.getChildren().add(groupDrop);
+            Line branchFromGroup = new Line(center, branchY, spineX, branchY); branchFromGroup.getStyleClass().add("hierarchy-edge"); pane.getChildren().add(branchFromGroup);
+            Line spine = new Line(spineX, branchY, spineX, lastCenterY); spine.getStyleClass().add("hierarchy-edge"); pane.getChildren().add(spine);
             for (int j = 0; j < people.size(); j++) {
-                double y = 270 + j * 175.0;
+                double y = 325 + j * 180.0;
                 Line edge = new Line(spineX, y + 80, x[i] + 35, y + 80); edge.getStyleClass().add("hierarchy-edge"); pane.getChildren().add(edge);
                 VBox person = memberCard(people.get(j)); person.setPrefSize(275, 160); person.setMinSize(275, 160);
                 person.setLayoutX(x[i] + 35); person.setLayoutY(y); pane.getChildren().add(person);
@@ -424,6 +430,7 @@ public final class MainView {
         HBox.setHgrow(details, Priority.ALWAYS);
         HBox row = new HBox(10, avatar(member), details);
         row.setAlignment(Pos.CENTER_LEFT); row.getStyleClass().add("member-node"); row.setPadding(new Insets(10));
+        row.setMaxHeight(Double.MAX_VALUE); VBox.setVgrow(row, Priority.ALWAYS);
         row.setAccessibleText(member.fullName() + ", " + member.academicYear() + ", " + roleName(member.role()));
         return new VBox(row);
     }

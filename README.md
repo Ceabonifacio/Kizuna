@@ -17,14 +17,14 @@ Install a JDK 25 or later, open a terminal in the project folder, and check `jav
 
 ```sh
 ./mvnw clean test
-./mvnw javafx:run
+./mvnw clean compile javafx:run
 ```
 
 **Windows (PowerShell):**
 
 ```powershell
 .\mvnw.cmd clean test
-.\mvnw.cmd javafx:run
+.\mvnw.cmd clean compile javafx:run
 ```
 
 The first wrapper run downloads Maven 3.10.0 into your local Maven cache. In VS Code, use **Terminal → Run Task → Run Kizuna (JavaFX)**; the task selects `mvnw` on macOS and `mvnw.cmd` on Windows. Do not use a single-file Java runner or Code Runner for `KizunaApp.java`; those launch Java without the JavaFX runtime modules. The recommended **Extension Pack for Java** helps with editing and debugging, but is not required to run the Maven task.
