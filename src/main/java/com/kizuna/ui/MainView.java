@@ -92,8 +92,10 @@ public final class MainView {
         Label tagline = new Label("Campus Event and Student Club Network App"); tagline.getStyleClass().add("top-tagline");
         Label school = new Label("Mindanao Kokusai Daigaku"); school.getStyleClass().add("school-name");
         VBox identity = new VBox(2, brand, tagline, school);
+        VBox logoBadge = new VBox(logoView(46)); logoBadge.setAlignment(Pos.CENTER); logoBadge.getStyleClass().add("brand-logo-frame");
+        HBox branding = new HBox(12, logoBadge, identity); branding.setAlignment(Pos.CENTER_LEFT);
         Region spacer = new Region(); HBox.setHgrow(spacer, Priority.ALWAYS);
-        header.getChildren().addAll(identity, spacer);
+        header.getChildren().addAll(branding, spacer);
         context.session.currentUser().ifPresent(user -> {
             Label signedIn = new Label(user.fullName()); signedIn.getStyleClass().add("top-user");
             Button logout = button("Log out", "button-secondary", () -> { context.auth.logout(); refreshHeader(); showLogin(); });
@@ -228,10 +230,6 @@ public final class MainView {
         if (user.assessmentCompletedAt() == null && managed.isEmpty()) { showAssessment(); return; }
         refreshHeader();
         VBox page = page("Hello, " + user.fullName(), "Find a club community, see what is happening, and follow your applications.");
-        Label school = label("Mindanao Kokusai Daigaku"); school.getStyleClass().add("school-name");
-        HBox dashboardBrand = new HBox(18, logoView(88), new VBox(8, sectionTitle("Kizuna"), school, label("Discover clubs, meet students, and find upcoming campus events.")));
-        dashboardBrand.setAlignment(Pos.CENTER_LEFT);
-        page.getChildren().add(dashboardBrand);
         FlowPane actions = new FlowPane(16, 16);
         actions.getChildren().addAll(dashboardAction("See Club Network", "Explore active club memberships as a network or hierarchy.", this::showNetwork),
                 dashboardAction("Upcoming Club Events", "Browse upcoming events from all six clubs.", this::showUpcomingEvents),

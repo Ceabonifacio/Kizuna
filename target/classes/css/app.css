@@ -15,6 +15,7 @@
     -fx-border-width: 0 0 2 0;
 }
 .brand { -fx-font-size: 22pt; -fx-font-weight: bold; -fx-text-fill: white; }
+.brand-logo-frame { -fx-padding: 5; -fx-background-color: #F7EDCB; -fx-background-radius: 8; }
 .top-tagline { -fx-font-size: 11pt; -fx-text-fill: #D5E1EC; }
 .school-name { -fx-font-size: 10pt; -fx-font-weight: bold; -fx-text-fill: #72540D; }
 .top-bar .school-name { -fx-text-fill: #E4C66A; }
