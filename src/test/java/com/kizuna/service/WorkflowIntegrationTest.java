@@ -31,7 +31,7 @@ class WorkflowIntegrationTest {
         Database database = new Database(temp.resolve("workflow.db"));
         database.initialize();
         PasswordHasher hasher = new PasswordHasher();
-        database.transaction(c -> { new DemoSeeder(hasher).seed(c); return null; });
+        database.transaction(c -> { new DemoSeeder().seed(c); return null; });
 
         UserRepository users = new UserRepository(); ClubRepository clubs = new ClubRepository();
         MembershipRepository membershipRepo = new MembershipRepository(clubs);
@@ -48,6 +48,9 @@ class WorkflowIntegrationTest {
         UserProfile demo = auth.login(" STUDENT.DEMO ", correct);
         assertEquals("student.demo", demo.username());
         assertTrue(allZero(correct));
+        auth.logout();
+        UserProfile adminDemo = auth.login("kaminari.president", DemoSeeder.DEMO_PASSWORD.toCharArray());
+        assertEquals("kaminari.president", adminDemo.username());
         auth.logout();
         String wrongPasswordMessage = assertThrows(IllegalArgumentException.class,
                 () -> auth.login("student.demo", "incorrect password".toCharArray())).getMessage();

@@ -3,13 +3,15 @@ package com.kizuna;
 import com.kizuna.db.Database;
 import com.kizuna.db.DemoSeeder;
 import com.kizuna.db.Schema;
-import com.kizuna.util.PasswordHasher;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
+import java.util.Base64;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -20,7 +22,7 @@ class DatabaseBootstrapTest {
     void createsAndSeedsSchemaIdempotentlyWithForeignKeysOnEveryConnection() throws Exception {
         Database db = new Database(temp.resolve("fresh.db"));
         db.initialize();
-        DemoSeeder seeder = new DemoSeeder(new PasswordHasher());
+        DemoSeeder seeder = new DemoSeeder();
         db.transaction(c -> { seeder.seed(c); return null; });
         db.transaction(c -> { seeder.seed(c); return null; });
 
@@ -39,6 +41,7 @@ class DatabaseBootstrapTest {
             assertEquals(0, count(c, "assessment_scores"));
             assertEquals(2, scalar(c, "SELECT count(*) FROM sqlite_master WHERE type='trigger' AND name IN ('trg_valid_application_status_transition','trg_application_must_start_pending')"));
             assertEquals(33, scalar(c, "SELECT count(*) FROM users WHERE password_hash LIKE 'pbkdf2_sha256$600000$%'"));
+            assertEquals(33, distinctDemoPasswordSalts(c));
             assertEquals(0, scalar(c, "SELECT count(*) FROM users WHERE password_hash=?", DemoSeeder.DEMO_PASSWORD));
             assertIntegrityGuards(c);
             return null;
@@ -97,6 +100,22 @@ class DatabaseBootstrapTest {
 
     private static int pragma(java.sql.Connection c, String sql) throws SQLException {
         try (var s = c.createStatement(); var rs = s.executeQuery(sql)) { rs.next(); return rs.getInt(1); }
+    }
+
+    private static int distinctDemoPasswordSalts(java.sql.Connection c) throws SQLException {
+        Set<String> salts = new HashSet<>();
+        try (var s = c.createStatement(); var rs = s.executeQuery("SELECT password_hash FROM users")) {
+            while (rs.next()) {
+                String[] parts = rs.getString(1).split("\\$", -1);
+                assertEquals(4, parts.length);
+                assertEquals("pbkdf2_sha256", parts[0]);
+                assertEquals("600000", parts[1]);
+                assertEquals(16, Base64.getDecoder().decode(parts[2]).length);
+                assertEquals(32, Base64.getDecoder().decode(parts[3]).length);
+                assertTrue(salts.add(parts[2]), "Each seeded account must have its own salt");
+            }
+        }
+        return salts.size();
     }
     private static int count(java.sql.Connection c, String table) throws SQLException { return scalar(c, "SELECT count(*) FROM " + table); }
     private static int scalar(java.sql.Connection c, String sql, Object... args) throws SQLException {

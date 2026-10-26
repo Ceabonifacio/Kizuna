@@ -1,7 +1,6 @@
 package com.kizuna.db;
 
 import com.kizuna.model.Models.Role;
-import com.kizuna.util.PasswordHasher;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,11 +8,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.Instant;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 public final class DemoSeeder {
     public static final String DEMO_PASSWORD = "KizunaDemo25!";
@@ -25,9 +26,24 @@ public final class DemoSeeder {
     private record QuestionSeed(String key, String prompt, List<OptionSeed> options) { }
     private record OptionSeed(String key, String label, Map<String, Integer> weights) { }
 
-    private final PasswordHasher hasher;
+    private final Properties demoPasswordHashes;
 
-    public DemoSeeder(PasswordHasher hasher) { this.hasher = hasher; }
+    public DemoSeeder() {
+        this.demoPasswordHashes = loadDemoPasswordHashes();
+    }
+
+    private static Properties loadDemoPasswordHashes() {
+        Properties hashes = new Properties();
+        try (InputStream input = DemoSeeder.class.getResourceAsStream("/com/kizuna/db/demo-password-hashes.properties")) {
+            if (input == null) {
+                throw new IllegalStateException("The bundled demo account hashes are missing.");
+            }
+            hashes.load(input);
+        } catch (IOException e) {
+            throw new IllegalStateException("Could not load the local demo account hashes.", e);
+        }
+        return hashes;
+    }
 
     public void seed(Connection connection) throws SQLException {
         seedInterests(connection);
@@ -178,19 +194,19 @@ public final class DemoSeeder {
                 new AccountSeed("student.kai", "Sam Taylor", "1st Year", "Ichiban", Role.MEMBER, true)
         ));
         accounts.addAll(additionalMembers());
-        char[] password = DEMO_PASSWORD.toCharArray();
         try (PreparedStatement exists = c.prepareStatement("SELECT 1 FROM users WHERE username=?");
              PreparedStatement insert = c.prepareStatement("INSERT INTO users(username,password_hash,full_name,academic_year,created_at_ms) VALUES(?,?,?,?,?)")) {
             for (AccountSeed account : accounts) {
                 exists.setString(1, account.username());
                 try (ResultSet rs = exists.executeQuery()) { if (rs.next()) continue; }
-                char[] copy = password.clone();
-                String encoded;
-                try { encoded = hasher.hash(copy); } finally { Arrays.fill(copy, '\0'); }
+                String encoded = demoPasswordHashes.getProperty(account.username());
+                if (encoded == null) {
+                    throw new SQLException("The bundled demo password hash is missing for " + account.username() + ".");
+                }
                 insert.setString(1, account.username()); insert.setString(2, encoded); insert.setString(3, account.name());
                 insert.setString(4, account.year()); insert.setLong(5, Instant.now().toEpochMilli()); insert.executeUpdate();
             }
-        } finally { Arrays.fill(password, '\0'); }
+        }
     }
 
     private void seedMemberships(Connection c) throws SQLException {

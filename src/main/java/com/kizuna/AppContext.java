@@ -45,7 +45,7 @@ public final class AppContext {
         Database database = new Database(dataDirectory.resolve("kizuna.db"));
         database.initialize();
         PasswordHasher hasher = new PasswordHasher();
-        database.transaction(connection -> { new DemoSeeder(hasher).seed(connection); return null; });
+        database.transaction(connection -> { new DemoSeeder().seed(connection); return null; });
 
         AvatarStore avatars = new AvatarStore(dataDirectory.resolve("avatars"));
         Session session = new Session();
